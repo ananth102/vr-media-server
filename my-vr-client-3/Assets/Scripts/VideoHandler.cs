@@ -28,6 +28,7 @@ public class VideoHandler : MonoBehaviour
     private int videoWidth;
     Renderer m_Renderer;
     public Texture play_texture,pause_texture;
+    private bool restartDimensions = false;
 
 
     // Start is called before the first frame update
@@ -39,10 +40,11 @@ public class VideoHandler : MonoBehaviour
         if(videoUrl != null && videoUrl.Length > 0){
             videoPlayer.url = videoUrl;
             videoPlayer.Prepare();
-            Debug.Log(videoPlayer.texture);
-            setDimensions();
+            Debug.Log(videoPlayer.clip);
+            // setDimensions();
             play();
             playState = true;
+            restartDimensions = true;
         }
         
     }
@@ -50,12 +52,16 @@ public class VideoHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(restartDimensions){
+            setDimensions();
+        }
         
     }
 
     public void setVideoUrl(string url){
         videoUrl = url;
         videoPlayer.url = videoUrl;
+        restartDimensions = true;
     }
 
     public void playDecision(){
@@ -91,10 +97,13 @@ public class VideoHandler : MonoBehaviour
     }
 
     public void setDimensions(){
-        videoHeight = (int)videoPlayer.texture.height;
-        videoWidth = (int)videoPlayer.texture.width;
+        videoHeight = (int)videoPlayer.height;
+        videoWidth = (int)videoPlayer.width;
+        if(videoHeight == 0 || videoWidth == 0)return;
         float w_t_h_ratio = (float)videoWidth/(float)videoHeight;
         Vector3 updatedScale = new Vector3(w_t_h_ratio*videoScale,videoScale,1);
         gameObject.transform.localScale = updatedScale;
+        restartDimensions = false;
+        Debug.Log("Changed Dimesions");
     }
 }
